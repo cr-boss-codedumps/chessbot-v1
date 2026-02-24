@@ -180,13 +180,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
     <script>
         const game = new Chess();
-        let stockfish, selected = null, lastMove = null;
+        let stocksalmon, selected = null, lastMove = null;
         const pieces = {w:{k:'♔',q:'♕',r:'♖',b:'♗',n:'♘',p:'♙'},b:{k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'}};
         
         function init() {
             try {
-                stockfish = new Worker('neuralnet.js');
-                stockfish.onmessage = e => {
+                stocksalmon = new Worker('neuralnet.js');
+                stocksalmon .onmessage = e => {
                     const m = e.data;
                     if (m.includes('bestmove')) {
                         const b = m.split('bestmove ')[1].split(' ')[0];
@@ -198,9 +198,9 @@
                         }
                     }
                 };
-                stockfish.postMessage('uci');
+                stocksalmon .postMessage('uci');
             } catch(e) {
-                document.getElementById('status').textContent = 'Neural network not loaded';
+                document.getElementById('status').textContent = 'the AI is sleeping, check back later';
             }
             draw();
             updateStatus();
@@ -210,7 +210,7 @@
             const status = document.getElementById('status');
             if (game.game_over()) {
                 if (game.in_checkmate()) {
-                    status.textContent = game.turn() === 'w' ? 'Black wins by checkmate!' : 'White wins by checkmate!';
+                    status.textContent = game.turn() === 'w' ? 'You lose!' : 'You won! (how is that possible)';
                 } else if (game.in_stalemate()) {
                     status.textContent = 'Stalemate!';
                 } else if (game.in_draw()) {
@@ -273,9 +273,9 @@
                     selected = null;
                     draw();
                     updateStatus();
-                    if (!game.game_over() && stockfish) {
-                        stockfish.postMessage('position fen ' + game.fen());
-                        stockfish.postMessage('go depth 10');
+                    if (!game.game_over() && stocksalmon ) {
+                        stocksalmon .postMessage('position fen ' + game.fen());
+                        stocksalmon .postMessage('go depth 10');
                     }
                 } else {
                     selected = null;
